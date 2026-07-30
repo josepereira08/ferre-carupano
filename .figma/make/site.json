@@ -1,0 +1,10 @@
+{
+  "description": "This web app serves as a comprehensive platform for a hardware store, showcasing products, promotions, and contact options while enhancing customer engagement.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

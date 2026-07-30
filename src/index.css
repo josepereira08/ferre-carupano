@@ -1,0 +1,213 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Roboto Slab', serif;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.slide-in {
+  animation: slideIn 0.5s ease forwards;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up {
+  animation: fadeUp 0.6s ease forwards;
+}
+
+/* hide scrollbar */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* WhatsApp float */
+.whatsapp-float {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 999;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #25D366;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(37,211,102,0.45);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.whatsapp-float:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 28px rgba(37,211,102,0.6);
+}
+
+/* Product card hover */
+.product-card {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+}
+
+/* Responsive helpers — hidden by default on desktop, toggled on mobile */
+.show-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Nav: hide desktop links, reveal hamburger + mobile menu */
+  .hidden-mobile {
+    display: none !important;
+  }
+  .show-mobile {
+    display: flex !important;
+  }
+
+  /* Banner: shorter and tighter on small screens */
+  #inicio {
+    height: 460px !important;
+  }
+  .banner-content {
+    padding: 0 22px !important;
+  }
+
+  /* Locations: stack map over info card */
+  .locations-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .locations-grid > div:first-child {
+    height: 280px !important;
+  }
+
+  /* Section headings scale down so they don't overflow */
+  section h2 {
+    font-size: 28px !important;
+    line-height: 1.15 !important;
+  }
+
+  /* WhatsApp float a touch smaller on mobile */
+  .whatsapp-float {
+    bottom: 18px;
+    right: 18px;
+    width: 54px;
+    height: 54px;
+  }
+
+  /* Catalog: two compact products per row to save scroll */
+  .catalog-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+  .product-img {
+    height: 140px !important;
+  }
+  .product-info {
+    padding: 12px 12px 14px !important;
+  }
+  .product-name {
+    font-size: 13px !important;
+  }
+  .product-price {
+    font-size: 18px !important;
+  }
+  .product-btn {
+    padding: 9px !important;
+    font-size: 13px !important;
+  }
+
+  /* Product modal stacks vertically on small screens */
+  .modal-card {
+    grid-template-columns: 1fr !important;
+  }
+  .modal-img {
+    min-height: 200px !important;
+    max-height: 240px !important;
+  }
+
+  /* Categories: horizontal swipe carousel to save vertical space */
+  .categories-grid {
+    display: flex !important;
+    grid-template-columns: none !important;
+    overflow-x: auto;
+    gap: 12px !important;
+    padding-bottom: 10px;
+    margin-right: -24px;
+    padding-right: 24px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .categories-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .category-card {
+    min-width: 148px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    padding: 16px 16px !important;
+  }
+  .category-card > div:first-child {
+    font-size: 30px !important;
+    margin-bottom: 8px !important;
+  }
+}
+
+/* Nav link */
+.nav-link {
+  position: relative;
+  text-decoration: none;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #DC2626;
+  transition: width 0.2s ease;
+}
+.nav-link:hover::after {
+  width: 100%;
+}
