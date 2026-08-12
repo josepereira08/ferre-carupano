@@ -92,7 +92,7 @@ const navLinks = [
   { label: 'Contacto', href: '#contacto' },
 ]
 
-function Navbar() {
+function Navbar({ onLogin }: { onLogin: () => void }) {
   const { site } = useData()
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -121,11 +121,15 @@ function Navbar() {
           ))}
         </nav>
 
-        <a href={waLink(site.waNumber)} target="_blank" rel="noreferrer" className="hidden-mobile"
-          style={{ background: '#25D366', color: '#fff', padding: '10px 20px', borderRadius: '6px', fontSize: '14px', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <IconWhatsApp />
-          WhatsApp
-        </a>
+        <button onClick={onLogin} className="hidden-mobile"
+          style={{ background: PRIMARY, color: '#fff', padding: '10px 20px', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+          onMouseEnter={e => (e.currentTarget.style.background = PRIMARY_DARK)}
+          onMouseLeave={e => (e.currentTarget.style.background = PRIMARY)}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+          </svg>
+          Iniciar sesión
+        </button>
 
         <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'none' }} className="show-mobile">
           <div style={{ width: '24px', height: '2px', background: '#1a1a1a', marginBottom: '5px' }} />
@@ -142,11 +146,13 @@ function Navbar() {
               {link.label}
             </a>
           ))}
-          <a href={waLink(site.waNumber)} target="_blank" rel="noreferrer" onClick={() => setMenuOpen(false)}
-            style={{ margin: '12px 24px 0', background: '#25D366', color: '#fff', padding: '13px', borderRadius: '6px', fontSize: '15px', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-            <IconWhatsApp />
-            WhatsApp
-          </a>
+          <button onClick={() => { setMenuOpen(false); onLogin() }}
+            style={{ margin: '12px 24px 0', background: PRIMARY, color: '#fff', padding: '13px', border: 'none', borderRadius: '6px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+            </svg>
+            Iniciar sesión
+          </button>
         </nav>
       )}
     </header>
@@ -530,7 +536,7 @@ function PublicSite({ onLogin }: { onLogin: () => void }) {
   const { site } = useData()
   return (
     <div style={{ minHeight: '100vh' }}>
-      <Navbar />
+      <Navbar onLogin={onLogin} />
       <BannerSlider />
       <Categories />
       <Catalog />
