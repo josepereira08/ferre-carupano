@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { DataProvider, useData, PRIMARY, PRIMARY_DARK } from './store'
+import { CartProvider, useCart, CartDrawer, CartFab } from './cart'
 import type { Product } from './store'
 import { Login } from './admin/Login'
 import { Admin } from './admin/Admin'
@@ -247,6 +248,8 @@ function Categories() {
 
 function ProductModal({ product, onClose }: { product: Product; onClose: () => void }) {
   const { site } = useData()
+  const cart = useCart()
+  const inCart = cart.has(product.id)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', onKey)
@@ -293,10 +296,21 @@ function ProductModal({ product, onClose }: { product: Product; onClose: () => v
             </>
           )}
 
+          <button
+            onClick={() => {
+              cart.add({ id: product.id, nombre: product.name, precio: product.price, img: product.image, categoria: product.category })
+              onClose()
+              cart.setOpen(true)
+            }}
+            style={inCart
+              ? { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0', padding: '14px', borderRadius: '8px', fontWeight: 700, fontSize: '15px', cursor: 'pointer', marginBottom: '10px' }
+              : { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', background: PRIMARY, color: '#fff', border: 'none', padding: '14px', borderRadius: '8px', fontWeight: 700, fontSize: '15px', cursor: 'pointer', marginBottom: '10px' }}>
+            {inCart ? '✓ En tu pedido — ver lista' : '＋ Agregar a mi pedido'}
+          </button>
           <a href={waLink(site.waNumber, `Hola, quiero consultar sobre este producto:\n\n• ${product.name} (${product.brand})\n• Precio: ${fmt(product.price)} / ${fmtBs(product.price, site.bsRate)}\n\n¿Está disponible?`)} target="_blank" rel="noreferrer"
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', background: '#25D366', color: '#fff', padding: '14px', borderRadius: '8px', fontWeight: 700, fontSize: '15px', textDecoration: 'none' }}>
             <IconWhatsApp />
-            Consultar por WhatsApp
+            Consultar solo este por WhatsApp
           </a>
         </div>
       </div>
@@ -306,6 +320,7 @@ function ProductModal({ product, onClose }: { product: Product; onClose: () => v
 
 function Catalog() {
   const { products, site } = useData()
+  const cart = useCart()
   const [filter, setFilter] = useState('Todos')
   const [selected, setSelected] = useState<Product | null>(null)
 
@@ -346,11 +361,24 @@ function Catalog() {
                 </div>
                 <div style={{ fontSize: '13px', color: '#555', fontWeight: 600, marginTop: '2px' }}>{fmtBs(product.price, site.bsRate)}</div>
                 {product.originalPrice && <div style={{ fontSize: '12px', color: '#059669', fontWeight: 600, marginTop: '4px' }}>Ahorras {fmt(product.originalPrice - product.price)}</div>}
-                <div style={{ flex: 1, minHeight: '14px' }} />
-                <button className="product-btn" style={{ width: '100%', padding: '11px', background: PRIMARY, color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', transition: 'background 0.15s' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = PRIMARY_DARK)} onMouseLeave={e => (e.currentTarget.style.background = PRIMARY)}>
-                  Ver detalles
+                <button onClick={(e) => { e.stopPropagation(); setSelected(product) }}
+                  style={{ background: 'none', border: 'none', padding: '2px 0', marginTop: '4px', color: '#888', fontSize: '12px', fontWeight: 600, cursor: 'pointer', textAlign: 'left' }}>
+                  Ver detalles ›
                 </button>
+                <div style={{ flex: 1, minHeight: '8px' }} />
+                {cart.has(product.id) ? (
+                  <button className="product-btn" onClick={(e) => { e.stopPropagation(); cart.setOpen(true) }}
+                    style={{ width: '100%', padding: '11px', background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0', borderRadius: '6px', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
+                    ✓ Agregado
+                  </button>
+                ) : (
+                  <button className="product-btn" onClick={(e) => { e.stopPropagation(); cart.add({ id: product.id, nombre: product.name, precio: product.price, img: product.image, categoria: product.category }) }}
+                    style={{ width: '100%', padding: '11px', background: PRIMARY, color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 700, fontSize: '14px', cursor: 'pointer', transition: 'background 0.15s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = PRIMARY_DARK)} onMouseLeave={e => (e.currentTarget.style.background = PRIMARY)}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+                    Agregar
+                  </button>
+                )}
               </div>
             </div>
           ))}
@@ -544,6 +572,8 @@ function PublicSite({ onLogin }: { onLogin: () => void }) {
       <Locations />
       <ContactSection />
       <Footer onLogin={onLogin} />
+      <CartDrawer />
+      <CartFab />
       <a href={waLink(site.waNumber)} target="_blank" rel="noreferrer" className="whatsapp-float" title="Escríbenos por WhatsApp">
         <span style={{ display: 'flex', color: '#fff', transform: 'scale(1.4)' }}><IconWhatsApp /></span>
       </a>
@@ -576,7 +606,9 @@ function Root() {
 export default function App() {
   return (
     <DataProvider>
-      <Root />
+      <CartProvider>
+        <Root />
+      </CartProvider>
     </DataProvider>
   )
 }
