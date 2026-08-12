@@ -562,6 +562,7 @@ function Footer({ onLogin }: { onLogin: () => void }) {
 
 function PublicSite({ onLogin }: { onLogin: () => void }) {
   const { site } = useData()
+  const cart = useCart()
   return (
     <div style={{ minHeight: '100vh' }}>
       <Navbar onLogin={onLogin} />
@@ -574,9 +575,11 @@ function PublicSite({ onLogin }: { onLogin: () => void }) {
       <Footer onLogin={onLogin} />
       <CartDrawer />
       <CartFab />
-      <a href={waLink(site.waNumber)} target="_blank" rel="noreferrer" className="whatsapp-float" title="Escríbenos por WhatsApp">
-        <span style={{ display: 'flex', color: '#fff', transform: 'scale(1.4)' }}><IconWhatsApp /></span>
-      </a>
+      {!cart.open && (
+        <a href={waLink(site.waNumber)} target="_blank" rel="noreferrer" className="whatsapp-float" title="Escríbenos por WhatsApp">
+          <span style={{ display: 'flex', color: '#fff', transform: 'scale(1.4)' }}><IconWhatsApp /></span>
+        </a>
+      )}
     </div>
   )
 }
