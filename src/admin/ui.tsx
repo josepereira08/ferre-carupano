@@ -24,10 +24,11 @@ export function SectionTitle({ title, sub, right }: { title: string; sub?: strin
 }
 
 export function Btn({ children, onClick, variant = 'primary', type = 'button', className = '', title }: {
-  children: ReactNode; onClick?: () => void; variant?: 'primary' | 'ghost' | 'danger'; type?: 'button' | 'submit'; className?: string; title?: string
+  children: ReactNode; onClick?: () => void; variant?: 'primary' | 'ghost' | 'danger' | 'green'; type?: 'button' | 'submit'; className?: string; title?: string
 }) {
   const styles: Record<string, React.CSSProperties> = {
     primary: { backgroundColor: PRIMARY, color: '#fff' },
+    green: { backgroundColor: '#16a34a', color: '#fff' },
     danger: { backgroundColor: 'transparent', color: '#f87171', border: '1px solid rgba(248,113,113,0.5)' },
     ghost: { backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' },
   }
@@ -109,3 +110,15 @@ export function EmptyState({ icon = '📦', text }: { icon?: string; text: strin
     </div>
   )
 }
+
+export function EstadoBadge({ estado }: { estado: 'agotado' | 'bajo' | 'disponible' }) {
+  const map = {
+    disponible: { t: 'Disponible', bg: 'rgba(34,197,94,0.15)', c: '#4ade80' },
+    bajo: { t: 'Inventario bajo', bg: 'rgba(220,38,38,0.16)', c: '#f87171' },
+    agotado: { t: 'Agotado', bg: 'rgba(248,113,113,0.15)', c: '#f87171' },
+  }[estado]
+  return <span className="inline-block rounded-full px-2.5 py-0.5 text-xs font-bold" style={{ backgroundColor: map.bg, color: map.c }}>{map.t}</span>
+}
+
+/* Surface interna oscura para el modo avanzado */
+export const INNER = '#111'

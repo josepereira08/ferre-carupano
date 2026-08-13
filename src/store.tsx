@@ -34,6 +34,10 @@ export interface Product {
   description: string
   features: string[]
   active: boolean
+  /* Campos del modo avanzado (inventario) */
+  stock?: number
+  stockMin?: number
+  cost?: number
 }
 export interface Location {
   id: string
@@ -71,6 +75,28 @@ export const BADGE_COLORS: { label: string; color: string }[] = [
   { label: 'Popular', color: '#059669' },
   { label: 'Recomendado', color: '#7c3aed' },
 ]
+
+/* Modo avanzado: ventas e inventario */
+export interface VentaItem { productoId: string; nombre: string; cantidad: number; precio: number; subtotal: number }
+export interface Venta {
+  id: string; numero: string; ts: number; fecha: string; hora: string; cajero: string; cliente?: string
+  items: VentaItem[]; subtotal: number; descuento: number; impuesto: number; total: number
+  metodoPago: string; recibido?: number; cambio?: number; estado: string
+}
+export interface Movimiento {
+  id: string; fecha: string; productoId: string; producto: string
+  tipo: 'entrada' | 'salida' | 'venta' | 'ajuste'
+  cantidad: number; motivo: string; proveedor?: string; usuario: string
+  stockAnterior: number; stockNuevo: number; costo?: number
+}
+
+export const METODOS_PAGO = ['Efectivo', 'Pago Móvil', 'Punto de venta', 'Transferencia', 'Divisas ($)', 'Zelle']
+
+export const estadoStock = (p: Product): 'agotado' | 'bajo' | 'disponible' => {
+  const s = p.stock ?? 0
+  const min = p.stockMin ?? 5
+  return s <= 0 ? 'agotado' : s <= min ? 'bajo' : 'disponible'
+}
 
 /* ===================== Semilla ===================== */
 const SEED_SITE: SiteInfo = {
@@ -208,6 +234,15 @@ const SEED_USERS: User[] = [
   { id: 'u1', name: 'Administrador', username: 'admin', password: 'ferre123', role: 'admin' },
 ]
 
+/* Stock inicial para el modo avanzado (inventario) */
+const STOCK_BY_ID: Record<string, number> = { p1: 12, p2: 8, p3: 40, p4: 60, p5: 5, p6: 33, p7: 18, p8: 0 }
+const SEED_PRODUCTS_FULL: Product[] = SEED_PRODUCTS.map(p => ({
+  ...p,
+  stock: STOCK_BY_ID[p.id] ?? 20,
+  stockMin: 6,
+  cost: +(p.price * 0.65).toFixed(2),
+}))
+
 /* ===================== Store ===================== */
 interface DataCtx {
   site: SiteInfo
@@ -224,6 +259,12 @@ interface DataCtx {
   setBrands: (b: string[]) => void
   locations: Location[]
   setLocations: (l: Location[]) => void
+  /* Avanzado */
+  ventas: Venta[]
+  movimientos: Movimiento[]
+  registrarEntrada: (d: { productoId: string; cantidad: number; costo?: number; proveedor?: string; obs?: string }) => void
+  registrarSalida: (d: { productoId: string; cantidad: number; motivo: string }) => void
+  registrarVenta: (d: Omit<Venta, 'id' | 'numero' | 'ts' | 'fecha' | 'hora' | 'cajero' | 'estado'>) => Venta
   session: User | null
   login: (username: string, password: string) => boolean
   logout: () => void
@@ -249,14 +290,15 @@ const load = <T,>(key: string, fallback: T): T => {
 const K = {
   site: 'fh_site', slides: 'fh_slides', cats: 'fh_categories', prods: 'fh_products',
   brands: 'fh_brands', locs: 'fh_locations', users: 'fh_users', session: 'fh_session',
+  ventas: 'fh_ventas', movs: 'fh_movimientos',
 }
 
 // Al subir esta versión, se recargan los datos por defecto (para reflejar cambios
 // del catálogo aunque el navegador ya tuviera datos guardados).
-const STORAGE_VERSION = '2'
+const STORAGE_VERSION = '3'
 try {
   if (typeof localStorage !== 'undefined' && localStorage.getItem('fh_ver') !== STORAGE_VERSION) {
-    [K.site, K.slides, K.cats, K.prods, K.brands, K.locs].forEach(k => localStorage.removeItem(k))
+    [K.site, K.slides, K.cats, K.prods, K.brands, K.locs, K.ventas, K.movs].forEach(k => localStorage.removeItem(k))
     localStorage.setItem('fh_ver', STORAGE_VERSION)
   }
 } catch {
@@ -267,9 +309,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [site, setSiteState] = useState<SiteInfo>(() => load(K.site, SEED_SITE))
   const [slides, setSlidesState] = useState<Slide[]>(() => load(K.slides, SEED_SLIDES))
   const [categories, setCategoriesState] = useState<Category[]>(() => load(K.cats, SEED_CATEGORIES))
-  const [products, setProducts] = useState<Product[]>(() => load(K.prods, SEED_PRODUCTS))
+  const [products, setProducts] = useState<Product[]>(() => load(K.prods, SEED_PRODUCTS_FULL))
   const [brands, setBrandsState] = useState<string[]>(() => load(K.brands, SEED_BRANDS))
   const [locations, setLocationsState] = useState<Location[]>(() => load(K.locs, SEED_LOCATIONS))
+  const [ventas, setVentas] = useState<Venta[]>(() => load(K.ventas, []))
+  const [movimientos, setMovimientos] = useState<Movimiento[]>(() => load(K.movs, []))
   const [users] = useState<User[]>(() => load(K.users, SEED_USERS))
   const [session, setSession] = useState<User | null>(() => load(K.session, null))
 
@@ -279,6 +323,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   useEffect(() => { localStorage.setItem(K.prods, JSON.stringify(products)) }, [products])
   useEffect(() => { localStorage.setItem(K.brands, JSON.stringify(brands)) }, [brands])
   useEffect(() => { localStorage.setItem(K.locs, JSON.stringify(locations)) }, [locations])
+  useEffect(() => { localStorage.setItem(K.ventas, JSON.stringify(ventas)) }, [ventas])
+  useEffect(() => { localStorage.setItem(K.movs, JSON.stringify(movimientos)) }, [movimientos])
   useEffect(() => { localStorage.setItem(K.session, JSON.stringify(session)) }, [session])
 
   const setSite = (patch: Partial<SiteInfo>) => setSiteState(prev => ({ ...prev, ...patch }))
@@ -286,6 +332,42 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const updateProduct = (id: string, patch: Partial<Product>) =>
     setProducts(prev => prev.map(p => (p.id === id ? { ...p, ...patch } : p)))
   const deleteProduct = (id: string) => setProducts(prev => prev.filter(p => p.id !== id))
+
+  const kardex = (m: Omit<Movimiento, 'id' | 'fecha'>) =>
+    setMovimientos(prev => [{ ...m, id: uid(), fecha: new Date().toISOString() }, ...prev])
+
+  const registrarEntrada: DataCtx['registrarEntrada'] = ({ productoId, cantidad, costo, proveedor, obs }) => {
+    const p = products.find(x => x.id === productoId); if (!p) return
+    const anterior = p.stock ?? 0
+    const nuevo = anterior + cantidad
+    updateProduct(productoId, { stock: nuevo, ...(costo ? { cost: costo } : {}) })
+    kardex({ productoId, producto: p.name, tipo: 'entrada', cantidad, motivo: obs || 'Entrada de mercancía', proveedor, usuario: session?.name || 'admin', stockAnterior: anterior, stockNuevo: nuevo, costo })
+  }
+  const registrarSalida: DataCtx['registrarSalida'] = ({ productoId, cantidad, motivo }) => {
+    const p = products.find(x => x.id === productoId); if (!p) return
+    const anterior = p.stock ?? 0
+    const nuevo = Math.max(0, anterior - cantidad)
+    updateProduct(productoId, { stock: nuevo })
+    kardex({ productoId, producto: p.name, tipo: 'salida', cantidad, motivo, usuario: session?.name || 'admin', stockAnterior: anterior, stockNuevo: nuevo })
+  }
+  const registrarVenta: DataCtx['registrarVenta'] = (d) => {
+    const numero = `F-${String(ventas.length + 1).padStart(5, '0')}`
+    const now = new Date()
+    const venta: Venta = {
+      ...d, id: uid(), numero, ts: now.getTime(),
+      fecha: now.toLocaleDateString('es-VE'), hora: now.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' }),
+      cajero: session?.name || 'admin', estado: 'Completada',
+    }
+    setVentas(prev => [venta, ...prev])
+    d.items.forEach(it => {
+      const p = products.find(x => x.id === it.productoId); if (!p) return
+      const anterior = p.stock ?? 0
+      const nuevo = Math.max(0, anterior - it.cantidad)
+      updateProduct(it.productoId, { stock: nuevo })
+      kardex({ productoId: it.productoId, producto: it.nombre, tipo: 'venta', cantidad: it.cantidad, motivo: `Venta ${numero}`, usuario: session?.name || 'admin', stockAnterior: anterior, stockNuevo: nuevo })
+    })
+    return venta
+  }
 
   const login = useCallback((username: string, password: string) => {
     // Demo visual: el acceso es solo una muestra, no requiere credenciales válidas.
@@ -299,9 +381,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => setSession(null), [])
 
   const resetAll = () => {
-    [K.site, K.slides, K.cats, K.prods, K.brands, K.locs].forEach(k => localStorage.removeItem(k))
+    [K.site, K.slides, K.cats, K.prods, K.brands, K.locs, K.ventas, K.movs].forEach(k => localStorage.removeItem(k))
     setSiteState(SEED_SITE); setSlidesState(SEED_SLIDES); setCategoriesState(SEED_CATEGORIES)
-    setProducts(SEED_PRODUCTS); setBrandsState(SEED_BRANDS); setLocationsState(SEED_LOCATIONS)
+    setProducts(SEED_PRODUCTS_FULL); setBrandsState(SEED_BRANDS); setLocationsState(SEED_LOCATIONS)
+    setVentas([]); setMovimientos([])
   }
 
   return (
@@ -313,6 +396,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         products, addProduct, updateProduct, deleteProduct,
         brands, setBrands: setBrandsState,
         locations, setLocations: setLocationsState,
+        ventas, movimientos, registrarEntrada, registrarSalida, registrarVenta,
         session, login, logout, resetAll,
       }}
     >
