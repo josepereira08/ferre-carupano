@@ -288,11 +288,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const deleteProduct = (id: string) => setProducts(prev => prev.filter(p => p.id !== id))
 
   const login = useCallback((username: string, password: string) => {
+    // Demo visual: el acceso es solo una muestra, no requiere credenciales válidas.
+    // Entra siempre; si coincide con un usuario usa ese, si no, entra como admin.
     const u = users.find(
       x => x.username.toLowerCase() === username.trim().toLowerCase() && x.password === password,
     )
-    if (u) { setSession(u); return true }
-    return false
+    setSession(u ?? users[0])
+    return true
   }, [users])
   const logout = useCallback(() => setSession(null), [])
 

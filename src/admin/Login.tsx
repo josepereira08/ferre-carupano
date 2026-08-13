@@ -4,8 +4,8 @@ import { Field, Input } from './ui'
 
 export function Login({ onExit }: { onExit: () => void }) {
   const { login, site } = useData()
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('admin')
+  const [password, setPassword] = useState('ferre123')
   const [err, setErr] = useState(false)
 
   const submit = (e: React.FormEvent) => {
@@ -39,7 +39,7 @@ export function Login({ onExit }: { onExit: () => void }) {
           </form>
 
           <div className="mt-5 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-center text-xs text-white/50">
-            Acceso demo · usuario <b className="text-white/80">admin</b> · clave <b className="text-white/80">ferre123</b>
+            Muestra visual · presiona <b className="text-white/80">Ingresar</b> (los campos son opcionales)
           </div>
           <button onClick={onExit} className="mt-4 w-full text-center text-xs text-white/40 hover:text-white/70">← Volver al sitio</button>
         </div>
