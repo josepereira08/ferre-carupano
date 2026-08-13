@@ -62,7 +62,7 @@ export interface User {
 }
 
 export const CATEGORY_NAMES = [
-  'Herramientas Eléctricas', 'Herramientas de Mano', 'Plomería', 'Electricidad',
+  'Herramientas Eléctricas', 'Plomería', 'Electricidad',
   'Pintura & Acabados', 'Seguridad Industrial', 'Fijaciones & Tornillería', 'Materiales de Construcción',
 ]
 export const BADGE_COLORS: { label: string; color: string }[] = [
@@ -113,8 +113,7 @@ const SEED_SLIDES: Slide[] = [
 
 const SEED_CATEGORIES: Category[] = [
   { id: 'c1', name: 'Herramientas Eléctricas', icon: '⚡', count: 142, color: '#DC2626' },
-  { id: 'c2', name: 'Herramientas de Mano', icon: '🔧', count: 89, color: '#1a1a1a' },
-  { id: 'c3', name: 'Plomería', icon: '🚿', count: 67, color: '#1d4ed8' },
+  { id: 'c3', name: 'Plomería', icon: '🚿', count: 34, color: '#1d4ed8' },
   { id: 'c4', name: 'Electricidad', icon: '💡', count: 95, color: '#d97706' },
   { id: 'c5', name: 'Pintura & Acabados', icon: '🎨', count: 53, color: '#7c3aed' },
   { id: 'c6', name: 'Seguridad Industrial', icon: '🦺', count: 41, color: '#059669' },
@@ -145,19 +144,19 @@ const SEED_PRODUCTS: Product[] = [
     active: true,
   },
   {
-    id: 'p3', name: 'Set Herramientas 40 Piezas', brand: 'Stanley', category: 'Herramientas de Mano',
-    price: 82, originalPrice: 96, image: 'https://images.unsplash.com/photo-1581783898377-1c85bf937427?w=500&h=500&fit=crop&auto=format',
+    id: 'p3', name: 'Llave de Tubo Stillson 14"', brand: 'Truper', category: 'Plomería',
+    price: 22, originalPrice: 28, image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Straight_Pipe_Wrench_3C.jpg/960px-Straight_Pipe_Wrench_3C.jpg',
     badge: 'Oferta', badgeColor: '#DC2626',
-    description: 'Juego completo de 40 herramientas esenciales para el hogar y el taller, organizadas en un estuche resistente para tenerlas siempre a mano.',
-    features: ['40 piezas de acero cromado', 'Estuche organizador rígido', 'Llaves, destornilladores y dados', 'Incluye alicate y cinta métrica', 'Garantía de por vida'],
+    description: 'Llave de tubo (Stillson) de 14" para apretar y aflojar tuberías y conexiones roscadas. Mordazas dentadas con gran agarre para trabajos de plomería.',
+    features: ['Longitud de 14"', 'Mordazas dentadas autoajustables', 'Cuerpo de acero forjado', 'Ideal para tubería galvanizada y de hierro', 'Alta resistencia y durabilidad'],
     active: true,
   },
   {
-    id: 'p4', name: 'Martillo de Carpintero 20oz', brand: 'Truper', category: 'Herramientas de Mano',
-    price: 16, originalPrice: null, image: 'https://images.unsplash.com/photo-1586864387789-628af9feed72?w=500&h=500&fit=crop&auto=format',
-    badge: null, badgeColor: null,
-    description: 'Martillo de carpintero de 20 onzas con cabeza de acero forjado y mango antideslizante. Balanceado para un trabajo cómodo y preciso.',
-    features: ['Cabeza de acero forjado de 20oz', 'Mango de fibra de vidrio', 'Agarre ergonómico antideslizante', 'Uña curva para extraer clavos'],
+    id: 'p4', name: 'Llave de Paso 1/2" (Válvula de Bola)', brand: 'Genebre', category: 'Plomería',
+    price: 5.50, originalPrice: null, image: 'https://upload.wikimedia.org/wikipedia/commons/d/da/Brass-Ball-Valve_MF_Butterfly_12592-360x480_%284999932531%29.jpg',
+    badge: 'Nuevo', badgeColor: '#1d4ed8',
+    description: 'Válvula de bola (llave de paso) de bronce de 1/2" con manija de cierre rápido. Corta o habilita el flujo de agua de forma segura y confiable.',
+    features: ['Cuerpo de bronce', 'Rosca 1/2" macho-hembra', 'Cierre de 1/4 de vuelta', 'Manija tipo mariposa', 'Para agua fría y caliente'],
     active: true,
   },
   {
@@ -169,11 +168,11 @@ const SEED_PRODUCTS: Product[] = [
     active: true,
   },
   {
-    id: 'p6', name: 'Llave Inglesa Ajustable 12"', brand: 'Irwin', category: 'Herramientas de Mano',
-    price: 13, originalPrice: 19, image: 'https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=500&h=500&fit=crop&auto=format',
+    id: 'p6', name: 'Llave Ajustable 6" (Inglesa)', brand: 'Irwin', category: 'Plomería',
+    price: 9, originalPrice: 12, image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Adjustable_spanner.jpg/960px-Adjustable_spanner.jpg',
     badge: 'Oferta', badgeColor: '#DC2626',
-    description: 'Llave inglesa ajustable de 12 pulgadas con acabado cromado y mordazas de apertura amplia. Herramienta versátil para plomería y mecánica.',
-    features: ['Longitud de 12"', 'Mordaza ajustable de apertura amplia', 'Acero al cromo-vanadio', 'Escala graduada', 'Acabado anticorrosivo'],
+    description: 'Llave ajustable (inglesa) de 6" con mordaza de apertura amplia. Herramienta esencial para conexiones de plomería, griferías y tuercas de distintos tamaños.',
+    features: ['Longitud de 6" (150mm)', 'Mordaza ajustable de apertura amplia', 'Acero al cromo-vanadio', 'Escala graduada', 'Acabado anticorrosivo'],
     active: true,
   },
   {
@@ -250,6 +249,18 @@ const load = <T,>(key: string, fallback: T): T => {
 const K = {
   site: 'fh_site', slides: 'fh_slides', cats: 'fh_categories', prods: 'fh_products',
   brands: 'fh_brands', locs: 'fh_locations', users: 'fh_users', session: 'fh_session',
+}
+
+// Al subir esta versión, se recargan los datos por defecto (para reflejar cambios
+// del catálogo aunque el navegador ya tuviera datos guardados).
+const STORAGE_VERSION = '2'
+try {
+  if (typeof localStorage !== 'undefined' && localStorage.getItem('fh_ver') !== STORAGE_VERSION) {
+    [K.site, K.slides, K.cats, K.prods, K.brands, K.locs].forEach(k => localStorage.removeItem(k))
+    localStorage.setItem('fh_ver', STORAGE_VERSION)
+  }
+} catch {
+  // ignore
 }
 
 export function DataProvider({ children }: { children: ReactNode }) {
