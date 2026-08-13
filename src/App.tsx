@@ -132,7 +132,7 @@ function Navbar({ onLogin }: { onLogin: () => void }) {
           Iniciar sesión
         </button>
 
-        <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'none' }} className="show-mobile">
+        <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'none', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }} className="show-mobile">
           <div style={{ width: '24px', height: '2px', background: '#1a1a1a', marginBottom: '5px' }} />
           <div style={{ width: '24px', height: '2px', background: '#1a1a1a', marginBottom: '5px' }} />
           <div style={{ width: '24px', height: '2px', background: '#1a1a1a' }} />
